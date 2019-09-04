@@ -1,0 +1,48 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class PlayerMovement : MonoBehaviour
+{
+    public float speed;      //Velocidade horizontal do jogador
+    public float jumpForce;  //Força do pulo (a gravidade na funcionalidade RigidBody 2D precisa estar ativada)
+    private float moveInput; //Variável que verifica se o Jogador está querendo se mover
+
+    private Rigidbody2D rb; //Interação entre o Script e o RigidBody2D
+
+    private bool facingRight = true; //Verifica para qual lado o personagem está virado (deduzindo que ele sempre começa virado para a direita)
+
+    private void Start()
+    {
+        rb = GetComponent<Rigidbody2D>(); //Associa a funcionalidade RigidBody2D de GameObject que está o Script
+    }
+
+    private void FixedUpdate()
+    {
+        moveInput = Input.GetAxis("Horizontal"); //Essa função retorna "1" caso a tecla "seta direita" seja pressionada e "-1" caso a "seta esquerda" seja pressionada
+
+        //Determina a velocidade horizontal do RigidBody
+        //Para isso é criado um vetor de 2 dimensões e o associa à propriedade "velocity" do RigidBody
+        //O primeiro valor é equivalente ao X, e nele é inserido a direção da movimentação vezes a velocidade
+        //O segundo valor é equivalente ao Y, e nele é inserido o GET da velocidade em Y
+        //Obs.: "rb.velocity.x = moveInput * speed" não funciona 
+        rb.velocity = new Vector2(moveInput * speed, rb.velocity.y); 
+
+        if(!facingRight && moveInput > 0) //Se o personagem está virado para ESQUERDA e se mexendo para DIREITA
+        {
+            Flip();
+        }else if(facingRight && moveInput < 0) //Oposto de cima
+        {
+            Flip();
+        }
+    }
+
+    void Flip() //Executa a ação de inverter horizontalmente a imagem do personagem
+    {
+        facingRight = !facingRight; //Inverte o lado que está olhando (pq sempre que essa função entra é pq ele mudou a direção)
+        Vector3 Scaler = transform.localScale; //Cria um novo vetor tridimensional que pega os valores de X, Y e Z do "Scale" dentro do "Transform" do GameObject onde o script está inserido
+        Scaler.x *= -1; //Inverte o valor da propriedade X do vetor
+        transform.localScale = Scaler; //Insere esse novo vetor modificado no lugar do original
+    }
+
+}
